@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Box, List, ListItemButton, ListItemText, Typography, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 import '@fontsource/russo-one';
 
-export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+}
 
+export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const menuItems = [
     { label: "Catálogo Pokémon", link: "/catalogo" },
     { label: "Histórias", link: "/historias" },
@@ -19,15 +22,15 @@ export default function Sidebar() {
 
   return (
     <Box sx={{ display: "flex" }}>
-
+      {/* Botão Flutuante */}
       <motion.div
         initial={{ x: 0 }}
         animate={{ x: isOpen ? 250 : 0 }}
         transition={{ duration: 0.3 }}
         style={{
           position: "fixed",
-          top: "20px",
-          left: "20px",
+          top: "30px",
+          left: isOpen ? "20px" : "30px",
           zIndex: 1300,
         }}
       >
@@ -43,7 +46,7 @@ export default function Sidebar() {
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
             cursor: "pointer",
           }}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleSidebar}
         >
           <Typography
             sx={{
@@ -57,6 +60,7 @@ export default function Sidebar() {
         </Box>
       </motion.div>
 
+      {/* Sidebar */}
       <motion.div
         initial={{ x: -250 }}
         animate={{ x: isOpen ? 0 : -250 }}
@@ -74,7 +78,6 @@ export default function Sidebar() {
           flexDirection: "column",
         }}
       >
-
         <Box
           sx={{
             padding: "20px",
@@ -84,11 +87,9 @@ export default function Sidebar() {
             fontSize: "1.5rem",
           }}
         >
-          Pokémonpédia
+          Pokemonpédia
         </Box>
-
         <Divider sx={{ borderColor: "#fff" }} />
-
         <List>
           {menuItems.map((item, index) => (
             <ListItemButton
