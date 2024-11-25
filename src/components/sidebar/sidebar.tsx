@@ -8,16 +8,17 @@ import '@fontsource/russo-one';
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
+  onSelect: (option: string) => void; // Callback para enviar a opção selecionada
 }
 
-export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
+export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProps) {
   const menuItems = [
-    { label: "Catálogo Pokémon", link: "/catalogo" },
-    { label: "Histórias", link: "/historias" },
-    { label: "Curiosidades", link: "/curiosidades" },
-    { label: "Opções", link: "/opcoes" },
-    { label: "Sobre", link: "/sobre" },
-    { label: "Contato", link: "/contato" },
+    { label: "Catálogo Pokémon", value: "Catálogo Pokémon" },
+    { label: "Histórias", value: "Histórias" },
+    { label: "Curiosidades", value: "Curiosidades" },
+    { label: "Opções", value: "Opções" },
+    { label: "Sobre", value: "Sobre" },
+    { label: "Contato", value: "Contato" },
   ];
 
   return (
@@ -91,9 +92,9 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         </Box>
         <Divider sx={{ borderColor: "#fff" }} />
         <List>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <ListItemButton
-              key={index}
+              key={item.value}
               sx={{
                 padding: "10px 20px",
                 "&:hover": {
@@ -101,6 +102,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                   color: "#fff",
                 },
               }}
+              onClick={() => onSelect(item.value)} // Notifica o Layout
             >
               <ListItemText
                 primary={item.label}
