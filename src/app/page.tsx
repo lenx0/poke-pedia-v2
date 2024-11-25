@@ -1,12 +1,14 @@
 "use client";
 
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import '@fontsource/russo-one';
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Box
       sx={{
@@ -41,27 +43,29 @@ export default function Home() {
       </motion.div>
 
       {/* right-decoration */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2, delay: 4 }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "-50px",
-            right: "-50px",
-            width: "200px",
-            height: "200px",
-            borderRadius: "50%",
-            background: "rgb(201, 243, 16)",
-            zIndex: 0,
-          }}
-        />
-      </motion.div>
+      {!isMobile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 4 }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "-50px",
+              right: "-50px",
+              width: "200px",
+              height: "200px",
+              borderRadius: "50%",
+              background: "rgb(201, 243, 16)",
+              zIndex: 0,
+            }}
+          />
+        </motion.div>
+      )}
 
       {/* title */}
-      <Box sx={{ paddingTop: "50px", zIndex: 1 }}>
+      <Box sx={{ paddingTop: "50px", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -108,57 +112,87 @@ export default function Home() {
             variant="h5"
             sx={{
               textAlign: "center",
-              marginTop: "10px",
+              margin: "10px 10px 20px 10px",
             }}
           >
             Explore o universo Pokémon, conheça as criaturas e suas habilidades!
           </Typography>
         </motion.div>
 
-        <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2, delay: 10 }}
-        >
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
-          <Link href="/explore" passHref>
-          <Button variant="contained">Explorar</Button>
-          </Link>
-        </div>
-        </motion.div>
-        
+        {!isMobile ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2, delay: 10 }}
+          >
+            <div style={{ textAlign: "center", marginTop: "50px" }}>
+              <Link href="/explore" passHref>
+                <Button variant="contained">Explorar</Button>
+              </Link>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2, delay: 8 }}
+          >
+            <Button
+              href="/explore"
+              sx={{
+                padding: 0,
+                minWidth: "unset",
+                backgroundColor: "transparent",
+                border: "none",
+                animation: "bounce 1.5s infinite",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}
+            >
+              <Image
+                src="/images/pokeball.png"
+                alt="Entrar"
+                width={80}
+                height={80}
+              />
+            </Button>
+          </motion.div>
+        )}
       </Box>
 
       {/* float-button */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2, delay: 8 }}
-      >
-        <Button
-          href="/explore"
-          sx={{
-            position: "absolute",
-            bottom: "20px",
-            right: "20px",
-            padding: 0,
-            minWidth: "unset",
-            backgroundColor: "transparent",
-            border: "none",
-            animation: "bounce 1.5s infinite",
-            "&:hover": {
-              transform: "scale(1.1)",
-            },
-          }}
+      {!isMobile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 8 }}
         >
-          <Image
-            src="/images/pokeball.png"
-            alt="Entrar"
-            width={80}
-            height={80}
-          />
-        </Button>
-      </motion.div>
+          <Button
+            href="/explore"
+            sx={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              padding: 0,
+              minWidth: "unset",
+              backgroundColor: "transparent",
+              border: "none",
+              animation: "bounce 1.5s infinite",
+              "&:hover": {
+                transform: "scale(1.1)",
+              },
+            }}
+          >
+            <Image
+              src="/images/pokeball.png"
+              alt="Entrar"
+              width={80}
+              height={80}
+            />
+          </Button>
+        </motion.div>
+      )}
 
       {/* Footer */}
       <motion.div
@@ -169,17 +203,26 @@ export default function Home() {
         <Box
           component="footer"
           sx={{
+            display: "flex",
+            justifyContent: "center",
             width: "100%",
             textAlign: "center",
             backgroundColor: "#3a3a3fe6",
             padding: "10px 20px",
             color: "white",
+            flexDirection: { xs: "column", sm: "row" },
           }}
         >
-          <Typography variant="h6">
-            Este site utiliza imagens e informações oficiais de propriedade da{" "}
-            <strong>The Pokémon Company</strong>. Todos os direitos são reservados aos seus respectivos proprietários.
-          </Typography>
+          <Box sx={{
+            marginTop: "10px",
+            marginBottom: "10px",
+            width: { sm: "50%" },
+          }}>
+            <Typography variant="h6" sx={{ fontSize: { xs: "0.6rem" } }}>
+              Este site utiliza imagens e informações oficiais de propriedade da{" "}
+              <strong>The Pokémon Company</strong>.<br /> Todos os direitos são reservados aos seus respectivos proprietários.
+            </Typography>
+          </Box>
         </Box>
       </motion.div>
 
