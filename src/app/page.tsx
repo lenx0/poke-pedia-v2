@@ -4,6 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import '@fontsource/russo-one';
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -33,7 +34,7 @@ export default function Home() {
             width: "200px",
             height: "200px",
             borderRadius: "50%",
-            background: "rgba(255, 0, 0, 0.527)",
+            background: "rgb(235, 17, 17)",
             zIndex: 0,
           }}
         />
@@ -53,7 +54,7 @@ export default function Home() {
             width: "200px",
             height: "200px",
             borderRadius: "50%",
-            background: "rgba(183, 219, 23, 0.623)",
+            background: "rgb(201, 243, 16)",
             zIndex: 0,
           }}
         />
@@ -74,7 +75,7 @@ export default function Home() {
               fontSize: { lg: "7.5rem", xs: "2.5rem", sm: "3.5rem" },
             }}
           >
-            Pokémon Pédia
+            Pokémonpédia
           </Typography>
         </motion.div>
 
@@ -120,7 +121,9 @@ export default function Home() {
         transition={{ duration: 2, delay: 10 }}
         >
         <div style={{ textAlign: "center", marginTop: "50px" }}>
+          <Link href="/explore" passHref>
           <Button variant="contained">Explorar</Button>
+          </Link>
         </div>
         </motion.div>
         

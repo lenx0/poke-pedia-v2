@@ -58,13 +58,13 @@ const theme = createTheme({
         root: {
           borderRadius: "100%",
           padding: "12px 24px",
-          fontWeight: "bold"
+          // fontWeight: "bold"
         },
         containedPrimary: {
-          backgroundColor: "#ffcd05ff",
-          color: "#000000",
+          backgroundColor: "rgb(201, 243, 16)",
+          color: "#333333",
           "&:hover": {
-            backgroundColor: "#f20505",
+            backgroundColor: "rgb(235, 17, 17)",
             color: "#ffffff",
           },
         },
