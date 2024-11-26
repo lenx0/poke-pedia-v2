@@ -64,7 +64,7 @@ const theme = createTheme({
           backgroundColor: "rgb(201, 243, 16)",
           color: "#333333",
           "&:hover": {
-            backgroundColor: "rgb(235, 17, 17)",
+            backgroundColor: "#dd523b",
             color: "#ffffff",
           },
         },

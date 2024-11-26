@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import '@fontsource/russo-one';
 
 import "./styles.css";
@@ -9,7 +9,6 @@ import "./styles.css";
 interface PokemonCardProps {
   name: string;
   image: string;
-  description: string;
   types: string[];
 }
 
@@ -34,7 +33,7 @@ const typeIcons: Record<string, string> = {
   flying: "/icons/flying.svg",
 };
 
-const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, description, types }) => {
+const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, types }) => {
   return (
     <Box
       sx={{
@@ -97,7 +96,7 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, description, typ
         sx={{
           textAlign: "center",
           padding: "10px 0",
-          backgroundColor: "#dd523a",
+          backgroundColor: "#dd523b",
           color: "#fff",
           textTransform: "uppercase",
         }}
@@ -108,22 +107,22 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, description, typ
       {/* Descrição */}
       <Box
         sx={{
-          padding: "10px",
           backgroundColor: "#fff",
           borderTop: "1px solid #ddd",
         }}
       >
-        <Typography
-          variant="body2"
+        <Button
+          variant="contained"
           sx={{
-            color: "#333",
-            textAlign: "center",
-            maxHeight: "100px",
-            overflowY: "auto",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "#3b3a3f",
+            color: "#ffffff",
+            borderRadius: 0
           }}
         >
-          {description}
-        </Typography>
+          Saiba mais
+        </Button>
       </Box>
     </Box>
   );

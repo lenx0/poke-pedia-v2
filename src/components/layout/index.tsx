@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
 import Pagination from "@/components/pagination";
@@ -12,12 +12,12 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // const theme = useTheme();
+  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedOption, setSelectedOption] = useState<string | null>('Catálogo Pokémon');
   const [pokemonList, setPokemonList] = useState<
-    { name: string; image: string; description: string; types: string[] }[]
+    { name: string; image: string; types: string[] }[]
   >([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -35,7 +35,6 @@ export default function Layout({ children }: LayoutProps) {
           return {
             name: details?.name || pokemon.name,
             image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-            description: `Um incrível Pokémon chamado ${details?.name || pokemon.name}!`,
             types: details?.types.map((type) => type.type.name) || [],
           };
         })
@@ -48,10 +47,6 @@ export default function Layout({ children }: LayoutProps) {
   
       setPokemonList(pokemonDetails);
     };
-
-
-    
-  
 
   // Carrega os Pokémon sempre que a página ou a opção selecionada mudar
   useEffect(() => {
@@ -115,7 +110,6 @@ export default function Layout({ children }: LayoutProps) {
                   key={pokemon.name}
                   name={pokemon.name}
                   image={pokemon.image}
-                  description={pokemon.description}
                   types={pokemon.types}
                 />
               ))}
