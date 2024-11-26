@@ -5,7 +5,7 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
 import Pagination from "@/components/pagination";
-import { getPokemonList } from "@/services/pokemonService";
+import { getPokemonDetails, getPokemonList } from "@/services/pokemonService";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,24 +16,42 @@ export default function Layout({ children }: LayoutProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedOption, setSelectedOption] = useState<string | null>('Catálogo Pokémon');
-  const [pokemonList, setPokemonList] = useState<{ name: string; url: string }[]>([]);
+  const [pokemonList, setPokemonList] = useState<
+    { name: string; image: string; description: string; types: string[] }[]
+  >([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
   const POKEMON_PER_PAGE = 8;
 
-  const loadPokemon = async (currentPage: number) => {
-    const offset = (currentPage - 1) * POKEMON_PER_PAGE;
-    const pokemons = await getPokemonList(POKEMON_PER_PAGE, offset);
-    setPokemonList(pokemons);
+    const loadPokemon = async (currentPage: number) => {
+      const offset = (currentPage - 1) * POKEMON_PER_PAGE;
+      const pokemons = await getPokemonList(POKEMON_PER_PAGE, offset);
+  
+      const pokemonDetails = await Promise.all(
+        pokemons.map(async (pokemon) => {
+          const id = pokemon.url.split("/").slice(-2, -1)[0];
+          const details = await getPokemonDetails(Number(id));
+          return {
+            name: details?.name || pokemon.name,
+            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+            description: `Um incrível Pokémon chamado ${details?.name || pokemon.name}!`,
+            types: details?.types.map((type) => type.type.name) || [],
+          };
+        })
+      );
+      if (currentPage === 1) {
+        const response = await fetch("https://pokeapi.co/api/v2/pokemon");
+        const data = await response.json();
+        setTotalPages(Math.ceil(data.count / POKEMON_PER_PAGE));
+      }
+  
+      setPokemonList(pokemonDetails);
+    };
 
 
-    if (currentPage === 1) {
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const data = await response.json();
-      setTotalPages(Math.ceil(data.count / POKEMON_PER_PAGE));
-    }
-  };
+    
+  
 
   // Carrega os Pokémon sempre que a página ou a opção selecionada mudar
   useEffect(() => {
@@ -96,10 +114,9 @@ export default function Layout({ children }: LayoutProps) {
                 <PokemonCard
                   key={pokemon.name}
                   name={pokemon.name}
-                  image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.url
-                    .split("/")
-                    .slice(-2, -1)}.png`}
-                  description="Descrição do Pokémon carregada futuramente."
+                  image={pokemon.image}
+                  description={pokemon.description}
+                  types={pokemon.types}
                 />
               ))}
             </Box>
