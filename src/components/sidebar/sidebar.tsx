@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Box, List, ListItemButton, ListItemText, Typography, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 import '@fontsource/russo-one';
@@ -12,6 +12,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProps) {
+  const [selectedOption, setSelectedOption] = useState<string | null>('Catálogo Pokémon'); // Opção ativa
+
   const menuItems = [
     { label: "Catálogo Pokémon", value: "Catálogo Pokémon" },
     { label: "Histórias", value: "Histórias" },
@@ -20,6 +22,11 @@ export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProp
     { label: "Sobre", value: "Sobre" },
     { label: "Contato", value: "Contato" },
   ];
+
+  const handleSelect = (option: string) => {
+    setSelectedOption(option);
+    onSelect(option); // Notifica o Layout
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -97,17 +104,19 @@ export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProp
               key={item.value}
               sx={{
                 padding: "10px 20px",
+                backgroundColor: selectedOption === item.value ? "#dd523a" : "transparent",
+                color: selectedOption === item.value ? "#fff" : "#ccc",
                 "&:hover": {
                   backgroundColor: "#dd523a",
                   color: "#fff",
                 },
+                transition: "background-color 0.3s ease, color 0.3s ease",
               }}
-              onClick={() => onSelect(item.value)} // Notifica o Layout
+              onClick={() => handleSelect(item.value)}
             >
               <ListItemText
                 primary={item.label}
                 sx={{
-                  color: "#fff",
                   fontFamily: "'Russo One', sans-serif",
                 }}
               />
