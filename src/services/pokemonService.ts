@@ -19,6 +19,8 @@ interface PokemonDetails {
   id: number;
   name: string;
   types: PokemonType[];
+  weight: number;
+  height: number;
 }
 
 interface PokemonSpecies {

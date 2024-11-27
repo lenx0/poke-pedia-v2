@@ -10,6 +10,9 @@ interface PokemonCardProps {
   name: string;
   image: string;
   types: string[];
+  weight: number;
+  height: number;
+  onDetailsClick: () => void;
 }
 
 const typeIcons: Record<string, string> = {
@@ -33,7 +36,7 @@ const typeIcons: Record<string, string> = {
   flying: "/icons/flying.svg",
 };
 
-const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, types }) => {
+const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, types, onDetailsClick }) => {
   return (
     <Box
       sx={{
@@ -112,17 +115,18 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, types }) => {
         }}
       >
         <Button
-          variant="contained"
-          sx={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#3b3a3f",
-            color: "#ffffff",
-            borderRadius: 0
-          }}
-        >
-          Saiba mais
-        </Button>
+        variant="contained"
+        onClick={onDetailsClick}
+        sx={{
+          width: "100%",
+          height: "60px",
+          backgroundColor: "#3b3a3f",
+          color: "#fff",
+          borderRadius: 0,
+        }}
+      >
+        Saiba mais
+      </Button>
       </Box>
     </Box>
   );
