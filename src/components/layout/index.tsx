@@ -1,16 +1,14 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from "react";
-import { Box, Dialog, DialogContent, Typography, Button, Skeleton } from "@mui/material";
+import { ReactNode, useEffect, useState, useRef } from "react";
+import { Box, Dialog, DialogContent, Typography, Button, Skeleton, Grid, Pagination as MuiPagination } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
-import Pagination from "@/components/pagination";
 import { getPokemonDetails, getPokemonList } from "@/services/pokemonService";
 
 interface LayoutProps {
   children: ReactNode;
 }
-
 interface SelectedPokemon {
   name: string;
   image: string;
@@ -23,21 +21,29 @@ interface SelectedPokemon {
 export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedOption, setSelectedOption] = useState<string | null>("Catálogo Pokémon");
-  const [pokemonList, setPokemonList] = useState<
-    { name: string; image: string; types: string[], weight: number, height: number }[]
-  >([]);
+  
+  const [pokemonList, setPokemonList] = useState<{
+    name: string;
+    image: string;
+    types: string[],
+    weight: number,
+    height: number
+  }[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState<SelectedPokemon | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const POKEMON_PER_PAGE = 8;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const CARDS_PER_PAGE = 8;
 
   const loadPokemon = async (currentPage: number) => {
-    setLoading(true); // Ativar o loader
-    const offset = (currentPage - 1) * POKEMON_PER_PAGE;
-    const pokemons = await getPokemonList(POKEMON_PER_PAGE, offset);
+    setLoading(true);
+
+    const offset = (currentPage - 1) * CARDS_PER_PAGE;
+    const pokemons = await getPokemonList(CARDS_PER_PAGE, offset);
 
     const pokemonDetails = await Promise.all(
       pokemons.map(async (pokemon) => {
@@ -56,12 +62,12 @@ export default function Layout({ children }: LayoutProps) {
     if (currentPage === 1) {
       const response = await fetch("https://pokeapi.co/api/v2/pokemon");
       const data = await response.json();
-      setTotalPages(Math.ceil(data.count / POKEMON_PER_PAGE));
+      setTotalPages(Math.ceil(data.count / CARDS_PER_PAGE));
     }
 
     setPokemonList(pokemonDetails);
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    setLoading(false); // Desativar o loader
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -73,6 +79,11 @@ export default function Layout({ children }: LayoutProps) {
   const handleShowDetails = (pokemon: SelectedPokemon) => {
     setSelectedPokemon(pokemon);
     setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedPokemon(null);
   };
 
   return (
@@ -94,7 +105,7 @@ export default function Layout({ children }: LayoutProps) {
       <Box
         sx={{
           flexGrow: 1,
-          marginLeft: isSidebarOpen ? "260px" : "20px",
+          marginLeft: isSidebarOpen ? "270px" : "20px",
           marginTop: "20px",
           marginBottom: "20px",
           marginRight: "20px",
@@ -103,44 +114,38 @@ export default function Layout({ children }: LayoutProps) {
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           padding: "20px",
           transition: "margin 0.3s ease-in-out",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
         {selectedOption === "Catálogo Pokémon" ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column"
+          }}
           >
-            <Box
+            <Grid
+              container
+              ref={containerRef}
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "20px",
                 justifyContent: "center",
-                marginBottom: "20px",
-
+                alignItems: "center",
+                flexWrap: "wrap",
               }}
             >
               {loading
-                ? Array.from({ length: POKEMON_PER_PAGE }).map((_, index) => (
-                  <Box
+                ? Array.from({ length: CARDS_PER_PAGE }).map((_, index) => (
+                  <Grid item
                     key={index}
-                    sx={{
-                      width: "300px",
-                      backgroundColor: "#f7f7f7",
-                      borderRadius: "10px",
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                      overflow: "hidden",
-                      fontFamily: "'Russo One', sans-serif",
-                      margin: "10px",
-                    }}
+                    sx={{ padding: 4, margin: "10px" }}
                   >
                     <Skeleton
                       variant="rectangular"
-                      width="100%"
-                      height="200px"
+                      width="300px"
+                      height="220px"
                       sx={{
                         borderRadius: "10px 10px 0 0",
                       }}
@@ -150,7 +155,6 @@ export default function Layout({ children }: LayoutProps) {
                       width="100%"
                       height="50px"
                       sx={{
-
                         borderRadius: "5px",
                       }}
                     />
@@ -162,126 +166,97 @@ export default function Layout({ children }: LayoutProps) {
                         borderRadius: "0 0 10px 10px",
                       }}
                     />
-                  </Box>
+                  </Grid>
                 ))
                 : pokemonList.map((pokemon) => (
-                  <PokemonCard
-                    key={pokemon.name}
-                    name={pokemon.name}
-                    image={pokemon.image}
-                    types={pokemon.types}
-                    weight={pokemon.weight}
-                    height={pokemon.height}
-                    onDetailsClick={() =>
-                      handleShowDetails({
-                        name: pokemon.name,
-                        image: pokemon.image,
-                        types: pokemon.types,
-                        weight: pokemon?.weight,
-                        height: pokemon?.height,
-                        description: `Um incrível Pokémon chamado ${pokemon.name}!`,
-                      })
-                    }
-                  />
+                  <Grid item sx={{ padding: 4 }} key={pokemon.name}>
+                    <PokemonCard
+                      name={pokemon.name}
+                      image={pokemon.image}
+                      types={pokemon.types}
+                      weight={pokemon.weight}
+                      height={pokemon.height}
+                      onDetailsClick={() =>
+                        handleShowDetails({
+                          name: pokemon.name,
+                          image: pokemon.image,
+                          types: pokemon.types,
+                          weight: pokemon.weight,
+                          height: pokemon.height,
+                          description: `Um incrível Pokémon chamado ${pokemon.name}!`,
+                        })
+                      }
+                    />
+                  </Grid>
                 ))}
+            </Grid>
 
+            {/* Paginação fixa */}
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                position: "fixed",
+                marginLeft: isSidebarOpen ? "125px" : "",
+                bottom: 0,
+                left: 0,
+                padding: "10px",
+                backgroundColor: "#fff",
+                boxShadow: "0 -2px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <MuiPagination
+                count={totalPages}
+                page={page}
+                onChange={(event, value) => setPage(value)}
+                color="primary"
+              />
             </Box>
-
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onNext={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              onPrevious={() => setPage((prev) => Math.max(prev - 1, 1))}
-            />
           </Box>
         ) : (
           children
         )}
-      </Box>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-        <DialogContent
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            fontFamily: "'Russo One', sans-serif",
-            backgroundColor: "#f5f5f5",
-          }}
-        >
-          {selectedPokemon && (
-            <>
-              <Box
-                component="img"
-                src={selectedPokemon.image}
-                alt={selectedPokemon.name}
-                sx={{
-                  width: "200px",
-                  height: "200px",
-                  objectFit: "contain",
-                }}
-              />
-              <Typography
-                variant="h4"
-                sx={{
-                  color: "#dd523a",
-                  textTransform: "uppercase",
-                }}
-              >
-                {selectedPokemon.name}
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "#333",
-                  textAlign: "center",
-                  maxWidth: "600px",
-                }}
-              >
-                {selectedPokemon.description}
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: "20px",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                <Typography>Altura: {selectedPokemon.height / 10} m</Typography>
-                <Typography>Peso: {selectedPokemon.weight / 10} kg</Typography>
+        {/* Diálogo de detalhes */}
+        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+          <DialogContent>
+            {selectedPokemon && (
+              <Box sx={{ textAlign: "center" }}>
+                <Box
+                  component="img"
+                  src={selectedPokemon.image}
+                  alt={selectedPokemon.name}
+                  sx={{ width: "200px", height: "200px", marginBottom: "16px" }}
+                />
+                <Typography variant="h5" gutterBottom>
+                  {selectedPokemon.name}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Tipos: {selectedPokemon.types.join(", ")}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Peso: {selectedPokemon.weight} kg
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Altura: {selectedPokemon.height} m
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {selectedPokemon.description}
+                </Typography>
+                <Button
+                  onClick={handleCloseDialog}
+                  variant="contained"
+                  color="primary"
+                  sx={{ marginTop: "16px" }}
+                >
+                  Fechar
+                </Button>
               </Box>
-              <Box sx={{ display: "flex", gap: "10px" }}>
-                {selectedPokemon.types.map((type) => (
-                  <Typography
-                    key={type}
-                    sx={{
-                      backgroundColor: "#3a3a3f",
-                      color: "#fff",
-                      borderRadius: "8px",
-                      padding: "5px 10px",
-                    }}
-                  >
-                    {type}
-                  </Typography>
-                ))}
-              </Box>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#dd523a",
-                  color: "#fff",
-                  "&:hover": { backgroundColor: "#bb412f" },
-                }}
-                onClick={() => setDialogOpen(false)}
-              >
-                Fechar
-              </Button>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </DialogContent>
+        </Dialog>
+      </Box>
     </Box>
   );
 }
