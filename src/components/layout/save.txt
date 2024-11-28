@@ -1,0 +1,80 @@
+<Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth={false} PaperProps={{
+          sx: {
+            width: "80%", // 80% da largura da tela
+            height: "80%", // Máxima altura 90% da viewport
+          },
+        }}>
+          <DialogContent
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              backgroundColor: "#3a3a3f",
+              color: "#FFF",
+              width: "100%",
+            }}
+          >
+            {/* Imagem do Pokémon */}
+            <Box
+              sx={{
+                flex: "1",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                component="img"
+                src={pokemonList[0]?.image}
+                alt={pokemon.name}
+                sx={{ width: "200px", height: "200px" }}
+              />
+            </Box>
+
+            {/* Detalhes e Estatísticas */}
+            <Box sx={{ flex: "2", marginLeft: "24px" }}>
+              {/* Nome e Número */}
+              <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: "16px" }}>
+                {pokemon.name} <span style={{ color: "#888" }}>{pokemon.number}</span>
+              </Typography>
+
+              {/* Estatísticas */}
+              <Box sx={{ marginBottom: "16px" }}>
+                {renderStatBar("HP", pokemon.stats.hp, "#4CAF50")}
+                {renderStatBar("ATK", pokemon.stats.atk, "#FF9800")}
+                {renderStatBar("DEF", pokemon.stats.def, "#2196F3")}
+                {renderStatBar("SP.ATK", pokemon.stats.spAtk, "#9C27B0")}
+                {renderStatBar("SP.DEF", pokemon.stats.spDef, "#009688")}
+                {renderStatBar("SPEED", pokemon.stats.speed, "#F44336")}
+              </Box>
+
+              {/* Tipos */}
+              <Box sx={{ marginBottom: "16px", display: "flex", gap: "8px" }}>
+                {pokemon.types.map((type) => (
+                  <Chip
+                    key={type}
+                    label={type}
+                    sx={{
+                      // backgroundColor: typeColors[type],
+                      color: "#FFF",
+                      fontWeight: "bold",
+                      textTransform: "capitalize",
+                    }}
+                  />
+                ))}
+              </Box>
+
+              {/* Botão Comparar */}
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  padding: "8px 16px",
+                }}
+              >
+                Comparar
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>

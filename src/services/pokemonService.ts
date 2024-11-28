@@ -21,6 +21,8 @@ interface PokemonDetails {
   types: PokemonType[];
   weight: number;
   height: number;
+  description: string;
+  stats: { name: string; value: number }[];
 }
 
 interface PokemonSpecies {
@@ -57,6 +59,7 @@ export async function getPokemonSpecies(id: number): Promise<string | null> {
     const flavorText = response.data.flavor_text_entries.find(
       (entry) => entry.language.name === "en"
     );
+    console.log(flavorText);
     return flavorText ? flavorText.flavor_text.replace(/[\n\r\f]/g, " ") : null; // Limpar quebras de linha
   } catch (error) {
     console.error(`Erro ao buscar história do Pokémon com ID ${id}:`, error);

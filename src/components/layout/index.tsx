@@ -1,10 +1,10 @@
 'use client'
 
 import { ReactNode, useEffect, useState, useRef } from "react";
-import { Box, Dialog, DialogContent, Typography, Button, Skeleton, Grid, Pagination as MuiPagination } from "@mui/material";
+import { Box, Dialog, DialogContent, Typography, Skeleton, Grid, Pagination as MuiPagination } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
-import { getPokemonDetails, getPokemonList } from "@/services/pokemonService";
+import { getPokemonDetails, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,18 +16,21 @@ interface SelectedPokemon {
   weight: number;
   height: number;
   description: string;
+  stats: { name: string; value: number }[];
 }
 
 export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedOption, setSelectedOption] = useState<string | null>("Catálogo Pokémon");
-  
+
   const [pokemonList, setPokemonList] = useState<{
     name: string;
     image: string;
     types: string[],
     weight: number,
-    height: number
+    height: number,
+    description: string;
+    stats: { name: string; value: number }[];
   }[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -49,12 +52,20 @@ export default function Layout({ children }: LayoutProps) {
       pokemons.map(async (pokemon) => {
         const id = pokemon.url.split("/").slice(-2, -1)[0];
         const details = await getPokemonDetails(Number(id));
+        const description = await getPokemonSpecies(Number(id));
+        console.log("details api", details);
+        console.log("description api", description);
         return {
           name: details?.name || pokemon.name,
           image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
           types: details?.types.map((type) => type.type.name) || [],
           weight: details?.weight || 0,
           height: details?.height || 0,
+          description: description,
+          stats: details?.stats.map((stat) => ({
+            name: stat.stat.name,
+            value: stat.base_stat,
+          })) || [],
         };
       })
     );
@@ -78,6 +89,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleShowDetails = (pokemon: SelectedPokemon) => {
     setSelectedPokemon(pokemon);
+    console.log("selectedPokemon", pokemon);
     setDialogOpen(true);
   };
 
@@ -174,8 +186,6 @@ export default function Layout({ children }: LayoutProps) {
                       name={pokemon.name}
                       image={pokemon.image}
                       types={pokemon.types}
-                      weight={pokemon.weight}
-                      height={pokemon.height}
                       onDetailsClick={() =>
                         handleShowDetails({
                           name: pokemon.name,
@@ -183,7 +193,8 @@ export default function Layout({ children }: LayoutProps) {
                           types: pokemon.types,
                           weight: pokemon.weight,
                           height: pokemon.height,
-                          description: `Um incrível Pokémon chamado ${pokemon.name}!`,
+                          description: pokemon.description,
+                          stats: pokemon.stats,
                         })
                       }
                     />
@@ -191,7 +202,6 @@ export default function Layout({ children }: LayoutProps) {
                 ))}
             </Grid>
 
-            {/* Paginação fixa */}
             <Box
               sx={{
                 width: "100%",
@@ -218,42 +228,170 @@ export default function Layout({ children }: LayoutProps) {
           children
         )}
 
-        {/* Diálogo de detalhes */}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-          <DialogContent>
-            {selectedPokemon && (
-              <Box sx={{ textAlign: "center" }}>
+        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
+          <DialogContent sx={{ backgroundColor: "#4CAF50", padding: 4 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                color: "#fff",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginBottom: 4,
+              }}
+            >
+              {selectedPokemon?.name}
+            </Typography>
+
+            <Grid container spacing={3}>
+              {/* Esquerda: Imagem e Informações Básicas */}
+              <Grid item xs={12} md={6}>
                 <Box
-                  component="img"
-                  src={selectedPokemon.image}
-                  alt={selectedPokemon.name}
-                  sx={{ width: "200px", height: "200px", marginBottom: "16px" }}
-                />
-                <Typography variant="h5" gutterBottom>
-                  {selectedPokemon.name}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Tipos: {selectedPokemon.types.join(", ")}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Peso: {selectedPokemon.weight} kg
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Altura: {selectedPokemon.height} m
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {selectedPokemon.description}
-                </Typography>
-                <Button
-                  onClick={handleCloseDialog}
-                  variant="contained"
-                  color="primary"
-                  sx={{ marginTop: "16px" }}
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: 4,
+                    padding: 2,
+                    textAlign: "center",
+                    marginBottom: 2,
+                  }}
                 >
-                  Fechar
-                </Button>
-              </Box>
-            )}
+                  <img
+                    src={selectedPokemon?.image}
+                    alt="Venusaur"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxWidth: 300,
+                      margin: "0 auto",
+                    }}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: 4,
+                    padding: 2,
+                  }}
+                >
+                  <Typography variant="body2">
+                    <strong>Peso:</strong> {selectedPokemon?.weight}kg
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Altura:</strong> {selectedPokemon?.height}m
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Categoria:</strong> Seed
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Abilities:</strong> Overgrow
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Direita: Stats e Evoluções */}
+              <Grid item xs={12} md={6}>
+                {/* Stats */}
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: 4,
+                    padding: 2,
+                    marginBottom: 2,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ marginBottom: 2, textAlign: "center" }}>
+                    Base Stats
+                  </Typography>
+                  <Box>
+                    {/* {[
+                      { name: "HP", value: 80, color: "#FF5733" },
+                      { name: "Attack", value: 82, color: "#33FF57" },
+                      { name: "Defense", value: 83, color: "#3357FF" },
+                      { name: "Sp. Atk", value: 100, color: "#F1C40F" },
+                      { name: "Sp. Def", value: 100, color: "#8E44AD" },
+                      { name: "Speed", value: 80, color: "#E74C3C" },
+                    ].map((stat) => ( */}
+                    {selectedPokemon?.stats.map((stat) => (
+                      <Box key={stat.name} sx={{ marginBottom: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                          {stat.name}: {stat.value}
+                        </Typography>
+                        <Box
+                          sx={{
+                            height: 16,
+                            width: "100%",
+                            backgroundColor: "#e0e0e0",
+                            borderRadius: 8,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              height: "100%",
+                              width: `${stat.value}%`,
+                              // backgroundColor: stat.color,
+                              backgroundColor: "red"
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+
+                {/* Evoluções */}
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: 4,
+                    padding: 2,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ marginBottom: 2, textAlign: "center" }}>
+                    Evoluções
+                  </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+                    <img
+                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+                      alt="Bulbasaur"
+                      style={{ width: 80, height: 80 }}
+                    />
+                    <Typography variant="h6" sx={{ alignSelf: "center" }}>
+                      →
+                    </Typography>
+                    <img
+                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"
+                      alt="Ivysaur"
+                      style={{ width: 80, height: 80 }}
+                    />
+                    <Typography variant="h6" sx={{ alignSelf: "center" }}>
+                      →
+                    </Typography>
+                    <img
+                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png"
+                      alt="Venusaur"
+                      style={{ width: 80, height: 80 }}
+                    />
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+
+            {/* Descrição */}
+            <Box
+              sx={{
+                backgroundColor: "#fff",
+                borderRadius: 4,
+                padding: 2,
+                marginTop: 4,
+              }}
+            >
+              <Typography variant="h5" sx={{ marginBottom: 2, textAlign: "center" }}>
+                Descrição
+              </Typography>
+              <Typography variant="body2">
+                {selectedPokemon?.description}
+              </Typography>
+            </Box>
           </DialogContent>
         </Dialog>
       </Box>

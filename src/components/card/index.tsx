@@ -10,8 +10,6 @@ interface PokemonCardProps {
   name: string;
   image: string;
   types: string[];
-  weight: number;
-  height: number;
   onDetailsClick: () => void;
 }
 
@@ -107,7 +105,6 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, image, types, onDetails
         {name}
       </Typography>
 
-      {/* Descrição */}
       <Box
         sx={{
           backgroundColor: "#fff",
