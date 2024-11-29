@@ -25,6 +25,11 @@ interface PokemonDetails {
   stats: { name: string; value: number }[];
 }
 
+interface EvolutionWithImage {
+  name: string;
+  image: string;
+}
+
 interface PokemonSpecies {
   flavor_text_entries: { flavor_text: string; language: { name: string } }[];
 }
@@ -64,5 +69,43 @@ export async function getPokemonSpecies(id: number): Promise<string | null> {
   } catch (error) {
     console.error(`Erro ao buscar história do Pokémon com ID ${id}:`, error);
     return null;
+  }
+}
+
+export async function getPokemonEvolutionsWithImages(id: number): Promise<EvolutionWithImage[]> {
+  try {
+    // 1. Obter a URL da cadeia de evolução
+    const speciesResponse = await api.get(`/pokemon-species/${id}`);
+    const evolutionChainUrl = speciesResponse.data.evolution_chain.url;
+
+    // 2. Buscar a cadeia de evolução
+    const evolutionResponse = await api.get(evolutionChainUrl);
+    const chain = evolutionResponse.data.chain;
+
+    // 3. Função recursiva para coletar nomes das evoluções
+    const fetchEvolutions = async (chainNode: any): Promise<EvolutionWithImage[]> => {
+      const evolutions: EvolutionWithImage[] = [];
+
+      // Obter o nome do Pokémon atual
+      const name = chainNode.species.name;
+
+      // 4. Buscar a imagem do Pokémon
+      const pokemonResponse = await api.get(`/pokemon/${name}`);
+      const image = pokemonResponse.data.sprites.front_default;
+
+      evolutions.push({ name, image });
+
+      // Buscar as próximas evoluções
+      for (const next of chainNode.evolves_to) {
+        evolutions.push(...(await fetchEvolutions(next)));
+      }
+
+      return evolutions;
+    };
+
+    return await fetchEvolutions(chain);
+  } catch (error) {
+    console.error(`Erro ao buscar evoluções do Pokémon com ID ${id}:`, error);
+    return [];
   }
 }

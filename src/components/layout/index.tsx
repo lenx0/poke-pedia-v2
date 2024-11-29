@@ -1,10 +1,11 @@
 'use client'
 
-import { ReactNode, useEffect, useState, useRef } from "react";
-import { Box, Dialog, DialogContent, Typography, Skeleton, Grid, Pagination as MuiPagination } from "@mui/material";
+import React, { ReactNode, useEffect, useState, useRef } from "react";
+import { Box, Dialog, DialogContent, Typography, Skeleton, Grid, Pagination as MuiPagination, Button } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
-import { getPokemonDetails, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
+import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
+import Image from "next/image";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,10 +13,12 @@ interface LayoutProps {
 interface SelectedPokemon {
   name: string;
   image: string;
+  shinyImage: string;
   types: string[];
   weight: number;
   height: number;
   description: string;
+  evolutions: string[];
   stats: { name: string; value: number }[];
 }
 
@@ -26,10 +29,12 @@ export default function Layout({ children }: LayoutProps) {
   const [pokemonList, setPokemonList] = useState<{
     name: string;
     image: string;
+    shinyImage: string;
     types: string[],
     weight: number,
     height: number,
     description: string;
+    evolutions: string[];
     stats: { name: string; value: number }[];
   }[]>([]);
   const [page, setPage] = useState(1);
@@ -53,15 +58,19 @@ export default function Layout({ children }: LayoutProps) {
         const id = pokemon.url.split("/").slice(-2, -1)[0];
         const details = await getPokemonDetails(Number(id));
         const description = await getPokemonSpecies(Number(id));
+        const evolutions = await getPokemonEvolutionsWithImages(Number(id));
+        console.log("evolutions api", evolutions);
         console.log("details api", details);
         console.log("description api", description);
         return {
           name: details?.name || pokemon.name,
           image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+          shinyImage: details?.sprites.front_shiny || "",
           types: details?.types.map((type) => type.type.name) || [],
           weight: details?.weight || 0,
           height: details?.height || 0,
           description: description,
+          evolutions: evolutions,
           stats: details?.stats.map((stat) => ({
             name: stat.stat.name,
             value: stat.base_stat,
@@ -77,7 +86,7 @@ export default function Layout({ children }: LayoutProps) {
     }
 
     setPokemonList(pokemonDetails);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
   };
 
@@ -194,6 +203,7 @@ export default function Layout({ children }: LayoutProps) {
                           weight: pokemon.weight,
                           height: pokemon.height,
                           description: pokemon.description,
+                          evolutions: pokemon.evolutions,
                           stats: pokemon.stats,
                         })
                       }
@@ -229,7 +239,7 @@ export default function Layout({ children }: LayoutProps) {
         )}
 
         <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
-          <DialogContent sx={{ backgroundColor: "#4CAF50", padding: 4 }}>
+          <DialogContent sx={{ backgroundColor: "#3b3a3f", padding: 4 }}>
             <Typography
               variant="h4"
               sx={{
@@ -248,43 +258,74 @@ export default function Layout({ children }: LayoutProps) {
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    borderRadius: 4,
+                    borderRadius: "10px",
                     padding: 2,
                     textAlign: "center",
                     marginBottom: 2,
                   }}
                 >
-                  <img
-                    src={selectedPokemon?.image}
+                  <Image
+                    src={selectedPokemon?.image || ""}
                     alt="Venusaur"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      maxWidth: 300,
-                      margin: "0 auto",
-                    }}
+                    width={300}
+                    height={300}
                   />
                 </Box>
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    borderRadius: 4,
-                    padding: 2,
+                    borderRadius: "10px",
+                    padding: 4,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
                 >
-                  <Typography variant="body2">
-                    <strong>Peso:</strong> {selectedPokemon?.weight}kg
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Altura:</strong> {selectedPokemon?.height}m
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Categoria:</strong> Seed
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Abilities:</strong> Overgrow
-                  </Typography>
+                  <Grid container marginLeft={14}>
+                    {/* Coluna 1 */}
+                    <Grid item xs={6}>
+                      <Typography variant="body2">
+                        <strong>Peso:</strong> {selectedPokemon?.weight}kg
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Altura:</strong> {selectedPokemon?.height}m
+                      </Typography>
+
+                    </Grid>
+
+                    {/* Coluna 2 */}
+                    <Grid item xs={6}>
+                      <Typography variant="body2">
+                        <strong>Categoria:</strong> Seed
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Abilities:</strong> Overgrow
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Box sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                    mt: 3,
+                    gap: 2
+                  }}>
+                    <Button variant="contained" color="primary" sx={{
+                      borderRadius: "5px",
+                      width: 100,
+                      height: 20,
+                    }}>Moves</Button>
+                    <Button variant="contained" color="primary" sx={{
+                      borderRadius: "5px",
+                      width: 100,
+                      height: 20,
+                    }}
+                    
+                    >Shiny</Button>
+                  </Box>
                 </Box>
+
               </Grid>
 
               {/* Direita: Stats e Evoluções */}
@@ -293,7 +334,7 @@ export default function Layout({ children }: LayoutProps) {
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    borderRadius: 4,
+                    borderRadius: "10px",
                     padding: 2,
                     marginBottom: 2,
                   }}
@@ -320,7 +361,7 @@ export default function Layout({ children }: LayoutProps) {
                             height: 16,
                             width: "100%",
                             backgroundColor: "#e0e0e0",
-                            borderRadius: 8,
+                            borderRadius: "10px",
                             overflow: "hidden",
                           }}
                         >
@@ -342,35 +383,44 @@ export default function Layout({ children }: LayoutProps) {
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    borderRadius: 4,
+                    borderRadius: "10px",
                     padding: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                   }}
                 >
                   <Typography variant="h6" sx={{ marginBottom: 2, textAlign: "center" }}>
                     Evoluções
                   </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-                    <img
-                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
-                      alt="Bulbasaur"
-                      style={{ width: 80, height: 80 }}
-                    />
-                    <Typography variant="h6" sx={{ alignSelf: "center" }}>
-                      →
-                    </Typography>
-                    <img
-                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"
-                      alt="Ivysaur"
-                      style={{ width: 80, height: 80 }}
-                    />
-                    <Typography variant="h6" sx={{ alignSelf: "center" }}>
-                      →
-                    </Typography>
-                    <img
-                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png"
-                      alt="Venusaur"
-                      style={{ width: 80, height: 80 }}
-                    />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 2, // Espaçamento uniforme entre itens
+                    }}
+                  >
+                    {selectedPokemon?.evolutions.map((evolution, index) => (
+                      <React.Fragment key={index}>
+                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                          <Image
+                            src={evolution.image || ""}
+                            alt={evolution.name || ""}
+                            width={80}
+                            height={80}
+                          />
+                        </Box>
+                        {index < selectedPokemon.evolutions.length - 1 && ( // Verifica se não é o último
+                          <Typography
+                            variant="h6"
+                            sx={{ alignSelf: "center", marginX: 1, flexShrink: 0 }}
+                          >
+                            →
+                          </Typography>
+                        )}
+                      </React.Fragment>
+                    ))}
                   </Box>
                 </Box>
               </Grid>
@@ -380,7 +430,7 @@ export default function Layout({ children }: LayoutProps) {
             <Box
               sx={{
                 backgroundColor: "#fff",
-                borderRadius: 4,
+                borderRadius: "10px",
                 padding: 2,
                 marginTop: 4,
               }}
