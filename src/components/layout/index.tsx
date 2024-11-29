@@ -42,6 +42,7 @@ export default function Layout({ children }: LayoutProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState<SelectedPokemon | null>(null);
   const [loading, setLoading] = useState(false);
+  const [shinyVersion, setShinyVersion] = useState(false)
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -65,7 +66,7 @@ export default function Layout({ children }: LayoutProps) {
         return {
           name: details?.name || pokemon.name,
           image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
-          shinyImage: details?.sprites.front_shiny || "",
+          shinyImage: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${id}.png` || '',
           types: details?.types.map((type) => type.type.name) || [],
           weight: details?.weight || 0,
           height: details?.height || 0,
@@ -105,7 +106,12 @@ export default function Layout({ children }: LayoutProps) {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedPokemon(null);
+    setShinyVersion(false)
   };
+
+  const handleChangeVersion = () => {
+    setShinyVersion((prevState) => !prevState)
+  }
 
   return (
     <Box
@@ -199,6 +205,7 @@ export default function Layout({ children }: LayoutProps) {
                         handleShowDetails({
                           name: pokemon.name,
                           image: pokemon.image,
+                          shinyImage: pokemon.shinyImage,
                           types: pokemon.types,
                           weight: pokemon.weight,
                           height: pokemon.height,
@@ -265,7 +272,7 @@ export default function Layout({ children }: LayoutProps) {
                   }}
                 >
                   <Image
-                    src={selectedPokemon?.image || ""}
+                    src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
                     alt="Venusaur"
                     width={300}
                     height={300}
@@ -321,8 +328,8 @@ export default function Layout({ children }: LayoutProps) {
                       width: 100,
                       height: 20,
                     }}
-                    
-                    >Shiny</Button>
+                      onClick={() => handleChangeVersion()}
+                    >{shinyVersion ? "normal" : "shiny"}</Button>
                   </Box>
                 </Box>
 
@@ -386,6 +393,7 @@ export default function Layout({ children }: LayoutProps) {
                     borderRadius: "10px",
                     padding: 2,
                     display: "flex",
+                    maxHeight: "17vh",
                     flexDirection: "column",
                     alignItems: "center",
                   }}
@@ -397,8 +405,10 @@ export default function Layout({ children }: LayoutProps) {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      gap: 2, // Espaçamento uniforme entre itens
+                      justifyContent: selectedPokemon?.evolutions.length > 4 ? "flexStart" : "center",
+                      overflowX: "auto",
+                      width: "100%",
+                      gap: 2,
                     }}
                   >
                     {selectedPokemon?.evolutions.map((evolution, index) => (
