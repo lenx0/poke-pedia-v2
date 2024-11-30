@@ -55,10 +55,6 @@ export default function Layout({ children }: LayoutProps) {
 
   const CARDS_PER_PAGE = 8;
 
-  const handleImageError = (event) => {
-    event.target.src='/images/not-found.webp'
-  }
-
   const loadPokemon = async (currentPage: number) => {
     setLoading(true);
 
@@ -130,7 +126,7 @@ export default function Layout({ children }: LayoutProps) {
       sx={{
         display: "flex",
         width: "100vw",
-        height: "100vh",
+        height: "100%",
         backgroundColor: "#f5f5f5",
         overflow: "hidden",
       }}
@@ -151,7 +147,7 @@ export default function Layout({ children }: LayoutProps) {
           backgroundColor: "#ffffff",
           borderRadius: "8px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          padding: "20px",
+          padding: {xl: "20px", sm: 0},
           transition: "margin 0.3s ease-in-out",
           display: "flex",
           flexDirection: "column",
@@ -178,7 +174,7 @@ export default function Layout({ children }: LayoutProps) {
               {loading
                 ? <PokemonCardSkeleton count={CARDS_PER_PAGE} />
                 : pokemonList.map((pokemon) => (
-                  <Grid item sx={{ padding: 4 }} key={pokemon.name}>
+                  <Grid item sx={{ padding: {xl: 4, sm: 0} }} key={pokemon.name}>
                     <PokemonCard
                       name={pokemon.name}
                       image={pokemon.image}
@@ -258,14 +254,15 @@ export default function Layout({ children }: LayoutProps) {
                     marginBottom: 2,
                   }}
                 >
-                  {selectedPokemon?.image || selectedPokemon?.shinyImage && (
+                  {selectedPokemon?.image || selectedPokemon?.shinyImage ? (
                     <Image
                       src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
                       alt="Venusaur"
                       width={300}
                       height={300}
-                      onError={handleImageError}
                     />
+                  ) : (
+                    null
                   )}
 
                 </Box>
