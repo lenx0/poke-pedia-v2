@@ -55,6 +55,10 @@ export default function Layout({ children }: LayoutProps) {
 
   const CARDS_PER_PAGE = 8;
 
+  const handleImageError = (event) => {
+    event.target.src='/images/not-found.webp'
+  }
+
   const loadPokemon = async (currentPage: number) => {
     setLoading(true);
 
@@ -172,7 +176,7 @@ export default function Layout({ children }: LayoutProps) {
               }}
             >
               {loading
-                ? <PokemonCardSkeleton count={CARDS_PER_PAGE}/>
+                ? <PokemonCardSkeleton count={CARDS_PER_PAGE} />
                 : pokemonList.map((pokemon) => (
                   <Grid item sx={{ padding: 4 }} key={pokemon.name}>
                     <PokemonCard
@@ -254,12 +258,16 @@ export default function Layout({ children }: LayoutProps) {
                     marginBottom: 2,
                   }}
                 >
-                  <Image
-                    src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
-                    alt="Venusaur"
-                    width={300}
-                    height={300}
-                  />
+                  {selectedPokemon?.image || selectedPokemon?.shinyImage && (
+                    <Image
+                      src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
+                      alt="Venusaur"
+                      width={300}
+                      height={300}
+                      onError={handleImageError}
+                    />
+                  )}
+
                 </Box>
                 <Box
                   sx={{
@@ -391,12 +399,17 @@ export default function Layout({ children }: LayoutProps) {
                     {selectedPokemon?.evolutions.map((evolution, index) => (
                       <React.Fragment key={index}>
                         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                          <Image
-                            src={evolution?.image || ""}
-                            alt={evolution?.name || ""}
-                            width={80}
-                            height={80}
-                          />
+                          {evolution.image ? (
+                            <Image
+                              src={evolution?.image || ""}
+                              alt={evolution?.name || ""}
+                              width={80}
+                              height={80}
+                            />
+                          ) : (
+                            <Typography variant="h6">Imagem não disponível</Typography>
+                          )}
+
                         </Box>
                         {index < selectedPokemon.evolutions.length - 1 && ( // Verifica se não é o último
                           <Typography
