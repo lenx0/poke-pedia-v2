@@ -12,7 +12,7 @@ const theme = createTheme({
     },
     background: {
       default: "#ffffff",
-      paper: "#ffffff", // definir cor
+      paper: "#3b3a3f", // definir cor
     },
     text: {
       primary: "#333333",

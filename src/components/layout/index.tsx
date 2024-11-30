@@ -6,6 +6,8 @@ import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
 import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
 import Image from "next/image";
+import Moves from "../moves/moves";
+import { PokemonCardSkeleton } from "../skeleton";
 
 interface LayoutProps {
   children: ReactNode;
@@ -25,6 +27,10 @@ interface SelectedPokemon {
 export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedOption, setSelectedOption] = useState<string | null>("Catálogo Pokémon");
+  const [movesDialogOpen, setMovesDialogOpen] = useState(false);
+
+  const handleOpenMovesDialog = () => setMovesDialogOpen(true);
+  const handleCloseMovesDialog = () => setMovesDialogOpen(false);
 
   const [pokemonList, setPokemonList] = useState<{
     name: string;
@@ -35,6 +41,7 @@ export default function Layout({ children }: LayoutProps) {
     height: number,
     description: string;
     evolutions: string[];
+    moves: { move: { name: string } }[];
     stats: { name: string; value: number }[];
   }[]>([]);
   const [page, setPage] = useState(1);
@@ -72,6 +79,7 @@ export default function Layout({ children }: LayoutProps) {
           height: details?.height || 0,
           description: description,
           evolutions: evolutions,
+          moves: details?.moves || [],
           stats: details?.stats.map((stat) => ({
             name: stat.stat.name,
             value: stat.base_stat,
@@ -164,37 +172,7 @@ export default function Layout({ children }: LayoutProps) {
               }}
             >
               {loading
-                ? Array.from({ length: CARDS_PER_PAGE }).map((_, index) => (
-                  <Grid item
-                    key={index}
-                    sx={{ padding: 4, margin: "10px" }}
-                  >
-                    <Skeleton
-                      variant="rectangular"
-                      width="300px"
-                      height="220px"
-                      sx={{
-                        borderRadius: "10px 10px 0 0",
-                      }}
-                    />
-                    <Skeleton
-                      variant="text"
-                      width="100%"
-                      height="50px"
-                      sx={{
-                        borderRadius: "5px",
-                      }}
-                    />
-                    <Skeleton
-                      variant="rectangular"
-                      width="100%"
-                      height="60px"
-                      sx={{
-                        borderRadius: "0 0 10px 10px",
-                      }}
-                    />
-                  </Grid>
-                ))
+                ? <PokemonCardSkeleton count={CARDS_PER_PAGE}/>
                 : pokemonList.map((pokemon) => (
                   <Grid item sx={{ padding: 4 }} key={pokemon.name}>
                     <PokemonCard
@@ -211,6 +189,7 @@ export default function Layout({ children }: LayoutProps) {
                           height: pokemon.height,
                           description: pokemon.description,
                           evolutions: pokemon.evolutions,
+                          moves: pokemon.moves,
                           stats: pokemon.stats,
                         })
                       }
@@ -244,7 +223,11 @@ export default function Layout({ children }: LayoutProps) {
         ) : (
           children
         )}
-
+        <Moves
+          handleCloseMovesDialog={handleCloseMovesDialog}
+          movesDialogOpen={movesDialogOpen}
+          selectedPokemon={selectedPokemon}
+        />
         <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
           <DialogContent sx={{ backgroundColor: "#3b3a3f", padding: 4 }}>
             <Typography
@@ -322,7 +305,9 @@ export default function Layout({ children }: LayoutProps) {
                       borderRadius: "5px",
                       width: 100,
                       height: 20,
-                    }}>Moves</Button>
+                    }}
+                      onClick={handleOpenMovesDialog}
+                    >Moves</Button>
                     <Button variant="contained" color="primary" sx={{
                       borderRadius: "5px",
                       width: 100,
@@ -350,14 +335,6 @@ export default function Layout({ children }: LayoutProps) {
                     Base Stats
                   </Typography>
                   <Box>
-                    {/* {[
-                      { name: "HP", value: 80, color: "#FF5733" },
-                      { name: "Attack", value: 82, color: "#33FF57" },
-                      { name: "Defense", value: 83, color: "#3357FF" },
-                      { name: "Sp. Atk", value: 100, color: "#F1C40F" },
-                      { name: "Sp. Def", value: 100, color: "#8E44AD" },
-                      { name: "Speed", value: 80, color: "#E74C3C" },
-                    ].map((stat) => ( */}
                     {selectedPokemon?.stats.map((stat) => (
                       <Box key={stat.name} sx={{ marginBottom: 1 }}>
                         <Typography variant="body2" sx={{ fontWeight: "bold" }}>
@@ -415,8 +392,8 @@ export default function Layout({ children }: LayoutProps) {
                       <React.Fragment key={index}>
                         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                           <Image
-                            src={evolution.image || ""}
-                            alt={evolution.name || ""}
+                            src={evolution?.image || ""}
+                            alt={evolution?.name || ""}
                             width={80}
                             height={80}
                           />
