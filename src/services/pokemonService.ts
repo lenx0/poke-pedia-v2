@@ -54,6 +54,13 @@ export interface EvolutionWithImage {
   image: string;
 }
 
+interface EvolutionChainNode {
+  species: {
+    name: string;
+  };
+  evolves_to: EvolutionChainNode[]; // Nó recursivo
+}
+
 interface PokemonSpecies {
   flavor_text_entries: { flavor_text: string; language: { name: string } }[];
 }
@@ -104,7 +111,7 @@ export async function getPokemonEvolutionsWithImages(id: number): Promise<Evolut
     const chain = evolutionResponse.data.chain;
 
     // 3. Função recursiva para coletar nomes das evoluções
-    const fetchEvolutions = async (chainNode: any): Promise<EvolutionWithImage[]> => {
+    const fetchEvolutions = async (chainNode: EvolutionChainNode): Promise<EvolutionWithImage[]> => {
       const evolutions: EvolutionWithImage[] = [];
 
       // Obter o nome do Pokémon atual
