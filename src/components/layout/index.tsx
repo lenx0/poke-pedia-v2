@@ -15,17 +15,17 @@ interface LayoutProps {
 }
 
 interface BasePokemon {
-    name: string;
-    image: string;
-    shinyImage: string;
-    types: string[];
-    weight: number;
-    height: number;
-    description: string | null;
-    evolutions: EvolutionWithImage[];
-    moves: PokemonMove[];
-    stats: { name: string; value: number }[];
-  }
+  name: string;
+  image: string;
+  shinyImage: string;
+  types: string[];
+  weight: number;
+  height: number;
+  description: string | null;
+  evolutions: EvolutionWithImage[];
+  moves: PokemonMove[];
+  stats: { name: string; value: number }[];
+}
 
 export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -150,7 +150,8 @@ export function Layout({ children }: LayoutProps) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            flexDirection: "column"
+            flexDirection: "column",
+            marginTop: { xl: 0, xs: 8 },
           }}
           >
             <Grid
@@ -160,12 +161,13 @@ export function Layout({ children }: LayoutProps) {
                 justifyContent: "center",
                 alignItems: "center",
                 flexWrap: "wrap",
+
               }}
             >
               {loading
                 ? <PokemonCardSkeleton count={CARDS_PER_PAGE} />
                 : pokemonList.map((pokemon) => (
-                  <Grid item sx={{ padding: { xl: 4, sm: 0 } }} key={pokemon.name}>
+                  <Grid item sx={{ padding: { xl: 4, sm: 0 }, marginBottom: { xl: 0, xs: 5 } }} key={pokemon.name}>
                     <PokemonCard
                       name={pokemon.name}
                       image={pokemon.image}
@@ -239,18 +241,41 @@ export function Layout({ children }: LayoutProps) {
                   sx={{
                     backgroundColor: "#fff",
                     borderRadius: "10px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     padding: 2,
                     textAlign: "center",
                     marginBottom: 2,
                   }}
                 >
                   {selectedPokemon?.image || selectedPokemon?.shinyImage ? (
-                    <Image
-                      src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
-                      alt="Venusaur"
-                      width={300}
-                      height={300}
-                    />
+                    <Box
+                      sx={{
+                        width: {
+                          xs: 150,
+                          sm: 200,
+                          md: 250,
+                          lg: 300,
+                          xl: 300,
+                        },
+                        height: {
+                          xs: 150,
+                          sm: 200,
+                          md: 307,
+                          lg: 307,
+                          xl: 307,
+                        },
+                        position: "relative",
+                      }}
+                    >
+                      <Image
+                        src={!shinyVersion ? selectedPokemon?.image : selectedPokemon?.shinyImage}
+                        alt="Venusaur"
+                        fill
+                        style={{ objectFit: "contain" }}
+                      />
+                    </Box>
                   ) : (
                     children
                   )}
@@ -264,7 +289,15 @@ export function Layout({ children }: LayoutProps) {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
+                    width: "100%",
+                    height: {
+                      xs: 150,
+                      sm: 200,
+                      md: "auto",
+                      lg: "auto",
+                      xl: "auto",
+                    },
                   }}
                 >
                   <Grid container marginLeft={14}>
