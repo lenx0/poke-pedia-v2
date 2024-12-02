@@ -6,9 +6,9 @@ import Sidebar from "@/components/sidebar";
 import PokemonCard from "@/components/card";
 import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
 import Image from "next/image";
-import Moves from "../Moves";
+import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
-import { BasePokemon } from "./Layout.types";
+import { BasePokemon } from "./layout.types";
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

@@ -12,7 +12,7 @@ import {
   Paper,
   TablePagination,
 } from "@mui/material";
-import { MovesProps } from "./Moves.types";
+import { MovesProps } from "./moves.types";
 
 export default function Moves({
   movesDialogOpen,
