@@ -10,7 +10,11 @@ import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
 import { BasePokemon } from "./layout.types";
 
-export default function Layout() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [movesDialogOpen, setMovesDialogOpen] = useState(false);
 
@@ -235,7 +239,7 @@ export default function Layout() {
                       height={300}
                     />
                   ) : (
-                    null
+                    children
                   )}
 
                 </Box>
