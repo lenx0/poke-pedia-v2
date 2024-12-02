@@ -11,7 +11,11 @@ export interface MoveDetails {
   
   export interface SelectedPokemon {
     name: string;
-    moves: MoveDetails[];
+    version_group_details?: Array<{
+      move_learn_method: { name: string };
+      level_learned_at: number;
+      version_group: { name: string };
+    }>;
   }
   
   export interface MovesProps {
