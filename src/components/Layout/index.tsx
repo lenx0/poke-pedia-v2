@@ -27,7 +27,7 @@ interface BasePokemon {
     stats: { name: string; value: number }[];
   }
 
-export default function Layout({ children }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [movesDialogOpen, setMovesDialogOpen] = useState(false);
 
