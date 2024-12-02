@@ -21,10 +21,7 @@ export const typeColors: { [key: string]: string } = {
   export const getBackgroundColor = (types: string[]) => {
     if (types.length === 1) {
       return typeColors[types[0]] || "#3b3a3f"; 
-    } else if (types.length === 2) {
-      return `linear-gradient(135deg, ${typeColors[types[0]] || "#3b3a3f"}, ${typeColors[types[1]] || "#3b3a3f"})`;
-    }
-    return "#3b3a3f";
+    } 
   };
   
   

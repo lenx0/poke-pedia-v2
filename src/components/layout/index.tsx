@@ -9,7 +9,7 @@ import { EvolutionWithImage, PokemonMove } from "@/services/pokemonService";
 import Image from "next/image";
 import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
-import { getBackgroundColor } from "../utils/TypeColors";
+import { typeColors } from "../utils/TypeColors";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -232,7 +232,13 @@ export function Layout({ children }: LayoutProps) {
           selectedPokemon={selectedPokemon}
         />
         <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
-          <DialogContent sx={{ backgroundColor: getBackgroundColor(selectedPokemon?.types || []), padding: 4 }}>
+          <DialogContent sx={{
+            backgroundColor:
+              selectedPokemon?.types?.[0] && typeColors[selectedPokemon.types[0]]
+                ? typeColors[selectedPokemon.types[0]]
+                : "#3b3a3f",
+            padding: 4,
+          }}>
             <Typography
               variant="h4"
               sx={{
