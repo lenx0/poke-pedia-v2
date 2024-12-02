@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Box, Dialog, DialogContent, Typography, Grid, Pagination as MuiPagination, Button } from "@mui/material";
-import Sidebar from "@/components/sidebar/sidebar";
+import Sidebar from "@/components/sidebar";
 import PokemonCard from "@/components/card";
 import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
 import Image from "next/image";
-import Moves from "../Moves/Moves";
+import Moves from "../Moves";
 import { PokemonCardSkeleton } from "../skeleton";
 import { BasePokemon } from "./Layout.types";
 
