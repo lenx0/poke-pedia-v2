@@ -1,53 +1,28 @@
 'use client'
 
-import React, { ReactNode, useEffect, useState, useRef } from "react";
-import { Box, Dialog, DialogContent, Typography, Skeleton, Grid, Pagination as MuiPagination, Button } from "@mui/material";
+import React, { useEffect, useState, useRef } from "react";
+import { Box, Dialog, DialogContent, Typography, Grid, Pagination as MuiPagination, Button } from "@mui/material";
 import Sidebar from "@/components/sidebar/sidebar";
 import PokemonCard from "@/components/card";
 import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
 import Image from "next/image";
-import Moves from "../moves/moves";
+import Moves from "../Moves/Moves";
 import { PokemonCardSkeleton } from "../skeleton";
+import { BasePokemon } from "./Layout.types";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-interface SelectedPokemon {
-  name: string;
-  image: string;
-  shinyImage: string;
-  types: string[];
-  weight: number;
-  height: number;
-  description: string;
-  evolutions: string[];
-  stats: { name: string; value: number }[];
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<string | null>("Catálogo Pokémon");
   const [movesDialogOpen, setMovesDialogOpen] = useState(false);
 
   const handleOpenMovesDialog = () => setMovesDialogOpen(true);
   const handleCloseMovesDialog = () => setMovesDialogOpen(false);
 
-  const [pokemonList, setPokemonList] = useState<{
-    name: string;
-    image: string;
-    shinyImage: string;
-    types: string[],
-    weight: number,
-    height: number,
-    description: string;
-    evolutions: string[];
-    moves: { move: { name: string } }[];
-    stats: { name: string; value: number }[];
-  }[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>("Catálogo Pokémon");
+  const [pokemonList, setPokemonList] = useState<BasePokemon[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPokemon, setSelectedPokemon] = useState<SelectedPokemon | null>(null);
+  const [selectedPokemon, setSelectedPokemon] = useState<BasePokemon | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [shinyVersion, setShinyVersion] = useState(false)
 
@@ -77,13 +52,13 @@ export default function Layout({ children }: LayoutProps) {
           types: details?.types.map((type) => type.type.name) || [],
           weight: details?.weight || 0,
           height: details?.height || 0,
-          description: description,
-          evolutions: evolutions,
-          moves: details?.moves || [],
+          description: description || "No description available",
+          evolutions: evolutions || [],
           stats: details?.stats.map((stat) => ({
             name: stat.stat.name,
             value: stat.base_stat,
           })) || [],
+          moves: details?.moves || [],
         };
       })
     );
@@ -95,17 +70,10 @@ export default function Layout({ children }: LayoutProps) {
     }
 
     setPokemonList(pokemonDetails);
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
-  };
+  }
 
-  useEffect(() => {
-    if (selectedOption === "Catálogo Pokémon") {
-      loadPokemon(page);
-    }
-  }, [selectedOption, page]);
-
-  const handleShowDetails = (pokemon: SelectedPokemon) => {
+  const handleShowDetails = (pokemon: BasePokemon) => {
     setSelectedPokemon(pokemon);
     console.log("selectedPokemon", pokemon);
     setDialogOpen(true);
@@ -113,13 +81,19 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedPokemon(null);
+    setSelectedPokemon(undefined);
     setShinyVersion(false)
   };
 
   const handleChangeVersion = () => {
     setShinyVersion((prevState) => !prevState)
   }
+
+  useEffect(() => {
+    if (selectedOption === "Catálogo Pokémon") {
+      loadPokemon(page);
+    }
+  }, [selectedOption, page]);
 
   return (
     <Box
@@ -134,7 +108,7 @@ export default function Layout({ children }: LayoutProps) {
       <Sidebar
         isOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        onSelect={(option) => setSelectedOption(option)}
+        onSelectOption={(option) => setSelectedOption(option)}
       />
 
       <Box
@@ -147,7 +121,7 @@ export default function Layout({ children }: LayoutProps) {
           backgroundColor: "#ffffff",
           borderRadius: "8px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          padding: {xl: "20px", sm: 0},
+          padding: { xl: "20px", sm: 0 },
           transition: "margin 0.3s ease-in-out",
           display: "flex",
           flexDirection: "column",
@@ -174,7 +148,7 @@ export default function Layout({ children }: LayoutProps) {
               {loading
                 ? <PokemonCardSkeleton count={CARDS_PER_PAGE} />
                 : pokemonList.map((pokemon) => (
-                  <Grid item sx={{ padding: {xl: 4, sm: 0} }} key={pokemon.name}>
+                  <Grid item sx={{ padding: { xl: 4, sm: 0 } }} key={pokemon.name}>
                     <PokemonCard
                       name={pokemon.name}
                       image={pokemon.image}
@@ -221,7 +195,7 @@ export default function Layout({ children }: LayoutProps) {
             </Box>
           </Box>
         ) : (
-          children
+          null
         )}
         <Moves
           handleCloseMovesDialog={handleCloseMovesDialog}
@@ -243,7 +217,6 @@ export default function Layout({ children }: LayoutProps) {
             </Typography>
 
             <Grid container spacing={3}>
-              {/* Esquerda: Imagem e Informações Básicas */}
               <Grid item xs={12} md={6}>
                 <Box
                   sx={{
@@ -278,7 +251,6 @@ export default function Layout({ children }: LayoutProps) {
                   }}
                 >
                   <Grid container marginLeft={14}>
-                    {/* Coluna 1 */}
                     <Grid item xs={6}>
                       <Typography variant="body2">
                         <strong>Peso:</strong> {selectedPokemon?.weight}kg
@@ -289,7 +261,6 @@ export default function Layout({ children }: LayoutProps) {
 
                     </Grid>
 
-                    {/* Coluna 2 */}
                     <Grid item xs={6}>
                       <Typography variant="body2">
                         <strong>Categoria:</strong> Seed
@@ -325,9 +296,7 @@ export default function Layout({ children }: LayoutProps) {
 
               </Grid>
 
-              {/* Direita: Stats e Evoluções */}
               <Grid item xs={12} md={6}>
-                {/* Stats */}
                 <Box
                   sx={{
                     backgroundColor: "#fff",
@@ -358,7 +327,6 @@ export default function Layout({ children }: LayoutProps) {
                             sx={{
                               height: "100%",
                               width: `${stat.value}%`,
-                              // backgroundColor: stat.color,
                               backgroundColor: "red"
                             }}
                           />
@@ -368,7 +336,6 @@ export default function Layout({ children }: LayoutProps) {
                   </Box>
                 </Box>
 
-                {/* Evoluções */}
                 <Box
                   sx={{
                     backgroundColor: "#fff",
@@ -387,7 +354,7 @@ export default function Layout({ children }: LayoutProps) {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: selectedPokemon?.evolutions.length > 4 ? "flexStart" : "center",
+                      justifyContent: (selectedPokemon?.evolutions?.length || 0) > 4 ? "flex-start" : "center",
                       overflowX: "auto",
                       width: "100%",
                       gap: 2,
@@ -423,7 +390,6 @@ export default function Layout({ children }: LayoutProps) {
               </Grid>
             </Grid>
 
-            {/* Descrição */}
             <Box
               sx={{
                 backgroundColor: "#fff",

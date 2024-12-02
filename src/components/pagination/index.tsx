@@ -5,10 +5,10 @@ import { Box, Button, Typography } from "@mui/material";
 import '@fontsource/russo-one';
 
 interface PaginationProps {
-  currentPage: number; // Página atual
-  totalPages: number; // Total de páginas
-  onNext: () => void; // Função para avançar para a próxima página
-  onPrevious: () => void; // Função para retroceder para a página anterior
+  currentPage: number;
+  totalPages: number;
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -28,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({
         marginTop: "20px",
       }}
     >
-      {/* Botão Anterior */}
+
       <Button
         variant="contained"
         sx={{
@@ -41,7 +41,6 @@ const Pagination: React.FC<PaginationProps> = ({
         Anterior
       </Button>
 
-      {/* Número da Página */}
       <Typography
         sx={{
           fontSize: "1.2rem",
@@ -51,7 +50,6 @@ const Pagination: React.FC<PaginationProps> = ({
         Página {currentPage} de {totalPages}
       </Typography>
 
-      {/* Botão Próximo */}
       <Button
         variant="contained"
         sx={{

@@ -8,10 +8,10 @@ import '@fontsource/russo-one';
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
-  onSelect: (option: string) => void; // Callback para enviar a opção selecionada
+  onSelectOption: (option: string) => void;
 }
 
-export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProps) {
+export default function Sidebar({ isOpen, toggleSidebar, onSelectOption }: SidebarProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>('Catálogo Pokémon'); // Opção ativa
 
   const menuItems = [
@@ -25,12 +25,11 @@ export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProp
 
   const handleSelect = (option: string) => {
     setSelectedOption(option);
-    onSelect(option); // Notifica o Layout
+    onSelectOption(option);
   };
 
   return (
     <Box sx={{ display: "flex" }}>
-      {/* Botão Flutuante */}
       <motion.div
         initial={{ x: 0 }}
         animate={{ x: isOpen ? 250 : 0 }}
@@ -68,7 +67,6 @@ export default function Sidebar({ isOpen, toggleSidebar, onSelect }: SidebarProp
         </Box>
       </motion.div>
 
-      {/* Sidebar */}
       <motion.div
         initial={{ x: -250 }}
         animate={{ x: isOpen ? 0 : -250 }}
