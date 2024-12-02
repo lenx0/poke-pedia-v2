@@ -5,14 +5,27 @@ import { Box, Dialog, DialogContent, Typography, Grid, Pagination as MuiPaginati
 import Sidebar from "@/components/sidebar";
 import PokemonCard from "@/components/card";
 import { getPokemonDetails, getPokemonEvolutionsWithImages, getPokemonList, getPokemonSpecies } from "@/services/pokemonService";
+import { EvolutionWithImage, PokemonMove } from "@/services/pokemonService";
 import Image from "next/image";
 import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
-import { BasePokemon } from "./layout.types";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+interface BasePokemon {
+    name: string;
+    image: string;
+    shinyImage: string;
+    types: string[];
+    weight: number;
+    height: number;
+    description: string | null;
+    evolutions: EvolutionWithImage[];
+    moves: PokemonMove[];
+    stats: { name: string; value: number }[];
+  }
 
 export default function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

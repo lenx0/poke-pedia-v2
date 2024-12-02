@@ -1,4 +1,4 @@
-import Layout from "../../components/layout";
+import Layout from "@/components/layout";
 import { Box, Typography } from "@mui/material";
 
 export default function Explore() {
