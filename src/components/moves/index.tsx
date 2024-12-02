@@ -85,7 +85,9 @@ export default function Moves({
               </TableRow>
             </TableHead>
             <TableBody>
-              {currentMoves.map((moveObj, index) => (
+              {currentMoves.map((moveObj, index) => {
+                console.log("move", moveObj)
+                return ( 
                 <TableRow key={index}>
                   <TableCell sx={{ textAlign: "center" }}>{moveObj.move.name}</TableCell>
                   <TableCell sx={{ textAlign: "center" }}>
@@ -98,7 +100,8 @@ export default function Moves({
                     {moveObj.version_group_details[0].version_group.name}
                   </TableCell>
                 </TableRow>
-              ))}
+                )
+})}
             </TableBody>
           </Table>
         </TableContainer>
