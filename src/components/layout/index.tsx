@@ -9,6 +9,7 @@ import { EvolutionWithImage, PokemonMove } from "@/services/pokemonService";
 import Image from "next/image";
 import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
+import { getBackgroundColor } from "../utils/TypeColors";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -46,6 +47,15 @@ export function Layout({ children }: LayoutProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const CARDS_PER_PAGE = 8;
+
+  const statColors: { [key: string]: string } = {
+    hp: "#ec1644ce", // Cor para HP
+    attack: "#eb8e36dd", // Cor para Attack
+    defense: "#1737f0d5", // Cor para Defense
+    "special-attack": "#6f1585be", // Cor para Special Attack
+    "special-defense": "#6f1585be", // Cor para Special Defense
+    speed: "#1ae75ec8", // Cor para Speed
+  };
 
   const loadPokemon = async (currentPage: number) => {
     setLoading(true);
@@ -222,7 +232,7 @@ export function Layout({ children }: LayoutProps) {
           selectedPokemon={selectedPokemon}
         />
         <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
-          <DialogContent sx={{ backgroundColor: "#3b3a3f", padding: 4 }}>
+          <DialogContent sx={{ backgroundColor: getBackgroundColor(selectedPokemon?.types || []), padding: 4 }}>
             <Typography
               variant="h4"
               sx={{
@@ -300,26 +310,37 @@ export function Layout({ children }: LayoutProps) {
                     },
                   }}
                 >
-                  <Grid container marginLeft={14}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2">
-                        <strong>Peso:</strong> {selectedPokemon?.weight}kg
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Altura:</strong> {selectedPokemon?.height}m
-                      </Typography>
+                  <Box display="flex" justifyContent="center" width="100%">
+                    <Grid container spacing={2} justifyContent="center">
+                      {/* Primeira coluna */}
+                      <Grid item xs={6}>
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                          <Typography variant="body2">
+                            <strong>Peso:</strong> {selectedPokemon?.weight}kg
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Altura:</strong> {selectedPokemon?.height}m
+                          </Typography>
+                        </Box>
+                      </Grid>
 
+                      {/* Segunda coluna */}
+                      <Grid item xs={6}>
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                          <Typography variant="body2">
+                            <strong>Categoria:</strong> Seed
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Abilities:</strong> Overgrow
+                          </Typography>
+                        </Box>
+                      </Grid>
                     </Grid>
+                  </Box>
 
-                    <Grid item xs={6}>
-                      <Typography variant="body2">
-                        <strong>Categoria:</strong> Seed
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Abilities:</strong> Overgrow
-                      </Typography>
-                    </Grid>
-                  </Grid>
+
+
+
                   <Box sx={{
                     display: "flex",
                     justifyContent: "center",
@@ -377,7 +398,7 @@ export function Layout({ children }: LayoutProps) {
                             sx={{
                               height: "100%",
                               width: `${stat.value}%`,
-                              backgroundColor: "red"
+                              backgroundColor: statColors[stat.name] || "gray", // Fallback para cor padrão
                             }}
                           />
                         </Box>
