@@ -142,3 +142,31 @@ export async function getPokemonEvolutionsWithImages(id: number): Promise<Evolut
     return [];
   }
 }
+
+export async function filterPokemonByType(type: string): Promise<void> {
+  try {
+    // 1. Buscar todos os Pokémon de um determinado tipo
+    const response = await api.get(`/type/${type}`);
+    const pokemonList = response.data.pokemon.map((p: any) => p.pokemon);
+
+    console.log(`Pokémon do tipo ${type}:`, pokemonList);
+  } catch (error) {
+    console.error(`Erro ao filtrar Pokémon por tipo ${type}:`, error);
+  }
+}
+
+// Filtrar Pokémon por geração
+export async function filterPokemonByGeneration(generation: number): Promise<void> {
+  try {
+    // 2. Buscar todos os Pokémon de uma determinada geração
+    const response = await api.get(`/generation/${generation}`);
+    const pokemonList = response.data.pokemon_species.map((p: any) => ({
+      name: p.name,
+      url: p.url,
+    }));
+
+    console.log(`Pokémon da geração ${generation}:`, pokemonList);
+  } catch (error) {
+    console.error(`Erro ao filtrar Pokémon pela geração ${generation}:`, error);
+  }
+}

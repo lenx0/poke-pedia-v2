@@ -10,6 +10,7 @@ import Image from "next/image";
 import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
 import { typeColors } from "../utils/TypeColors";
+import PokemonFilter from "../pokemonFilter";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -174,6 +175,7 @@ export function Layout({ children }: LayoutProps) {
 
               }}
             >
+              {/* <PokemonFilter /> */}
               {loading
                 ? <PokemonCardSkeleton count={CARDS_PER_PAGE} />
                 : pokemonList.map((pokemon) => (
