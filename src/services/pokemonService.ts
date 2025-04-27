@@ -147,7 +147,7 @@ export async function filterPokemonByType(type: string): Promise<void> {
   try {
     // 1. Buscar todos os Pokémon de um determinado tipo
     const response = await api.get(`/type/${type}`);
-    const pokemonList = response.data.pokemon.map((p: any) => p.pokemon);
+    const pokemonList = response.data.pokemon.map((p: PokemonType) => p.type);
 
     console.log(`Pokémon do tipo ${type}:`, pokemonList);
   } catch (error) {
@@ -160,7 +160,7 @@ export async function filterPokemonByGeneration(generation: number): Promise<voi
   try {
     // 2. Buscar todos os Pokémon de uma determinada geração
     const response = await api.get(`/generation/${generation}`);
-    const pokemonList = response.data.pokemon_species.map((p: any) => ({
+    const pokemonList = response.data.pokemon_species.map((p: Pokemon) => ({
       name: p.name,
       url: p.url,
     }));
