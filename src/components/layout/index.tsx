@@ -11,6 +11,7 @@ import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
 import { typeColors } from "../utils/TypeColors";
 import PokemonFilter from "../pokemonFilter";
+import { capitalizeFirstLetter } from "../utils/CapitalizeFirstLetter";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -250,7 +251,7 @@ export function Layout({ children }: LayoutProps) {
                 marginBottom: 4,
               }}
             >
-              {selectedPokemon?.name}
+              {selectedPokemon?.name ? capitalizeFirstLetter(selectedPokemon.name) : 'Nome não disponível'}
             </Typography>
 
             <Grid container spacing={3}>
@@ -324,10 +325,10 @@ export function Layout({ children }: LayoutProps) {
                       <Grid item xs={6}>
                         <Box display="flex" flexDirection="column" alignItems="center">
                           <Typography variant="body2">
-                            <strong>Peso:</strong> {selectedPokemon?.weight}kg
+                            <strong>Weight:</strong> {selectedPokemon?.weight}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Altura:</strong> {selectedPokemon?.height}m
+                            <strong>Height:</strong> {selectedPokemon?.height}
                           </Typography>
                         </Box>
                       </Grid>
@@ -335,20 +336,23 @@ export function Layout({ children }: LayoutProps) {
                       {/* Segunda coluna */}
                       <Grid item xs={6}>
                         <Box display="flex" flexDirection="column" alignItems="center">
-                          <Typography variant="body2">
-                            <strong>Categoria:</strong> Seed
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Abilities:</strong> Overgrow
-                          </Typography>
+                        <Typography variant="body2">
+                          <strong>Type:</strong>{" "}
+                          {selectedPokemon?.types.map((type, index) => (
+                            <span key={type} style={{ color: typeColors[type] || "#000" }}>
+                              {capitalizeFirstLetter(type)}
+                              {index < selectedPokemon.types.length - 1 && ' '}
+                            </span>
+                          ))}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Evolve to:</strong>{" "}
+                          <span>soon</span>
+                        </Typography>
                         </Box>
                       </Grid>
                     </Grid>
                   </Box>
-
-
-
-
                   <Box sx={{
                     display: "flex",
                     justifyContent: "center",
