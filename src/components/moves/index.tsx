@@ -13,6 +13,7 @@ import {
   TablePagination,
 } from "@mui/material";
 import { MovesProps } from "./moves.types";
+import { capitalizeFirstLetter } from "../utils/CapitalizeFirstLetter";
 
 export default function Moves({
   movesDialogOpen,
@@ -54,7 +55,7 @@ export default function Moves({
             marginBottom: 4,
           }}
         >
-          Lista de habilidades de {selectedPokemon?.name}
+          {capitalizeFirstLetter(selectedPokemon?.name) + "'s"} moves list
         </Typography>
 
         <TableContainer
