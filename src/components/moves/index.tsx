@@ -55,7 +55,7 @@ export default function Moves({
             marginBottom: 4,
           }}
         >
-          {capitalizeFirstLetter(selectedPokemon?.name) + "'s"} moves list
+          {capitalizeFirstLetter(selectedPokemon?.name) + "'s"} move list
         </Typography>
 
         <TableContainer
