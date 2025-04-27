@@ -10,7 +10,6 @@ import Image from "next/image";
 import Moves from "../moves";
 import { PokemonCardSkeleton } from "../skeleton";
 import { typeColors } from "../utils/TypeColors";
-import PokemonFilter from "../pokemonFilter";
 import { capitalizeFirstLetter } from "../utils/CapitalizeFirstLetter";
 
 interface LayoutProps {
