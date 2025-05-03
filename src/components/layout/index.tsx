@@ -50,13 +50,15 @@ export function Layout({ children }: LayoutProps) {
   const CARDS_PER_PAGE = 8;
 
   const statColors: { [key: string]: string } = {
-    hp: "#ec1644ce", // Cor para HP
-    attack: "#eb8e36dd", // Cor para Attack
-    defense: "#1737f0d5", // Cor para Defense
-    "special-attack": "#6f1585be", // Cor para Special Attack
-    "special-defense": "#6f1585be", // Cor para Special Defense
-    speed: "#1ae75ec8", // Cor para Speed
+    Hp: "#f28b82cc",            
+    Attack: "#fbbc04cc",        
+    Defense: "#a7c7e7cc",       
+    "Special-attack": "#d7aefbcc",
+    "Special-defense": "#c3e88dcc",
+    Speed: "#fdcfe8cc",         
   };
+  
+  
 
   const loadPokemon = async (currentPage: number) => {
     setLoading(true);
@@ -83,7 +85,7 @@ export function Layout({ children }: LayoutProps) {
           description: description || "No description available",
           evolutions: evolutions || [],
           stats: details?.stats.map((stat) => ({
-            name: stat.stat.name,
+            name: capitalizeFirstLetter(stat.stat.name),
             value: stat.base_stat,
           })) || [],
           moves: details?.moves || [],
